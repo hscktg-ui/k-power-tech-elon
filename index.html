@@ -42,14 +42,13 @@
     </header>
 
     <main>
-      <!-- Hero: brand + one headline + one sentence + CTA + full-bleed image -->
       <section id="top" class="hero">
         <img
           class="hero__media"
-          src="images/products/hero-products.jpg"
-          alt="광파워텍이 제작한 변압기·리액터"
-          width="940"
-          height="578"
+          src="images/studio/studio-hero.jpg"
+          alt="광파워텍 변압기·리액터 스튜디오 제품군"
+          width="1920"
+          height="1080"
         />
         <div class="hero__shade" aria-hidden="true"></div>
         <div class="shell hero__content">
@@ -69,7 +68,7 @@
       <section class="position" aria-label="포지셔닝">
         <div class="shell position__inner">
           <p>
-            국내 동종 제조사와 같은 풀라인 —
+            국내 동종 제조와 같은 풀라인 —
             <strong>인버터·기동·콘덴서 리액터, 건식 변압기, 고조파 필터, AVR</strong>
             — 을 지명원 사양으로 공급하는 <em>김포의 전력장치 전문 제조사</em>입니다.
           </p>
@@ -85,7 +84,7 @@
 
           <div class="product-bands">
             <a class="band" href="#contact">
-              <img src="images/products/rx-lv-inv.jpg" alt="" loading="lazy" />
+              <img src="images/studio/studio-reactor-line.jpg" alt="인버터용 라인 리액터" loading="lazy" width="800" height="800" />
               <div>
                 <p class="band__code">IRAA · IRDA · IROA</p>
                 <h3>인버터용 리액터</h3>
@@ -93,7 +92,7 @@
               </div>
             </a>
             <a class="band" href="#contact">
-              <img src="images/products/rx-lv-cap1.jpg" alt="" loading="lazy" />
+              <img src="images/studio/studio-reactor-series.jpg" alt="콘덴서용 직렬리액터" loading="lazy" width="800" height="800" />
               <div>
                 <p class="band__code">SCLA · SCLH</p>
                 <h3>콘덴서용 직렬리액터</h3>
@@ -101,7 +100,7 @@
               </div>
             </a>
             <a class="band" href="#contact">
-              <img src="images/products/rx-lv-motor1.jpg" alt="" loading="lazy" />
+              <img src="images/studio/studio-reactor-start.jpg" alt="기동 리액터·단권변압기" loading="lazy" width="800" height="800" />
               <div>
                 <p class="band__code">SRLA · STLA</p>
                 <h3>기동 리액터 · 단권변압기</h3>
@@ -109,7 +108,7 @@
               </div>
             </a>
             <a class="band" href="#contact">
-              <img src="images/products/tr-06.jpg" alt="" loading="lazy" />
+              <img src="images/studio/studio-transformer.jpg" alt="건식 변압기" loading="lazy" width="800" height="800" />
               <div>
                 <p class="band__code">TLA · THA</p>
                 <h3>건식 변압기</h3>
@@ -117,7 +116,7 @@
               </div>
             </a>
             <a class="band" href="#contact">
-              <img src="images/products/tr-08.jpg" alt="" loading="lazy" />
+              <img src="images/studio/studio-filter.jpg" alt="고조파 필터·기타" loading="lazy" width="800" height="800" />
               <div>
                 <p class="band__code">Filter · AVR · UPS</p>
                 <h3>고조파 필터 · 기타</h3>
@@ -131,18 +130,18 @@
       <section id="proof" class="proof">
         <div class="shell">
           <header class="block-head">
-            <p class="eyebrow">Built in Gimpo</p>
-            <h2>실물이 곧 증명입니다.</h2>
+            <p class="eyebrow">Studio catalog</p>
+            <h2>제품이 먼저 보이게.</h2>
           </header>
           <div class="proof__grid">
-            <img src="images/products/rx-hv-motor.jpg" alt="모터기동용 고압 리액터" loading="lazy" />
-            <img src="images/products/rx-hv-cap.jpg" alt="콘덴서용 고압 리액터" loading="lazy" />
-            <img src="images/products/rx-hv-inv.jpg" alt="인버터용 고압 리액터" loading="lazy" />
-            <img src="images/products/rx-air.jpg" alt="Air core reactor" loading="lazy" />
-            <img src="images/products/tr-01.jpg" alt="건식 변압기" loading="lazy" />
-            <img src="images/products/product-large-1.jpg" alt="제작 제품" loading="lazy" />
-            <img src="images/products/product-large-2.jpg" alt="제작 제품" loading="lazy" />
-            <img src="images/products/facility-2.jpg" alt="설비·제품" loading="lazy" />
+            <img src="images/studio/studio-hv-start.jpg" alt="고압 기동 리액터" loading="lazy" />
+            <img src="images/studio/studio-reactor-line.jpg" alt="라인 리액터" loading="lazy" />
+            <img src="images/studio/studio-reactor-series.jpg" alt="직렬 리액터" loading="lazy" />
+            <img src="images/studio/studio-air-core.jpg" alt="Air core reactor" loading="lazy" />
+            <img src="images/studio/studio-transformer.jpg" alt="건식 변압기" loading="lazy" />
+            <img src="images/studio/studio-transformer-2.jpg" alt="건식 변압기" loading="lazy" />
+            <img src="images/studio/studio-reactor-start.jpg" alt="기동용" loading="lazy" />
+            <img src="images/studio/studio-filter.jpg" alt="필터·기타" loading="lazy" />
           </div>
         </div>
       </section>
@@ -210,8 +209,8 @@
             </address>
           </div>
           <form class="form" id="inquiry-form">
-            <label>업체명<input name="company" required /></label>
-            <label>연락처<input name="phone" type="tel" required /></label>
+            <label>업체명<input name="company" required autocomplete="organization" /></label>
+            <label>연락처<input name="phone" type="tel" required autocomplete="tel" /></label>
             <label
               >제품
               <select name="type" required>

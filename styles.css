@@ -403,6 +403,7 @@ p {
   width: 7.5rem;
   height: 7.5rem;
   object-fit: cover;
+  background: #eef1f5;
 }
 
 .band__code {
@@ -439,34 +440,37 @@ p {
 /* Proof gallery — photos only, no frames as cards */
 .proof {
   padding: 4.5rem 0 5rem;
-  background: var(--ink);
-  color: #fff;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 0%, rgba(0, 32, 96, 0.08), transparent),
+    linear-gradient(180deg, #f7f8fa, #eef1f5);
+  color: var(--ink);
 }
 
 .proof .eyebrow {
-  color: #ff8f9a;
+  color: var(--red);
 }
 
 .proof .block-head h2 {
-  color: #fff;
+  color: var(--ink);
 }
 
 .proof__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.55rem;
+  gap: 0.65rem;
 }
 
 .proof__grid img {
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
-  filter: saturate(1.05);
+  background: #fff;
+  border: 1px solid var(--line);
   transition: transform 0.7s var(--ease);
 }
 
 .proof__grid img:hover {
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 
 @media (min-width: 800px) {
