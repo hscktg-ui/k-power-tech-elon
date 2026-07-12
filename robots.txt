@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Allow: /images/
+Allow: /k-power-tech-brochure.pdf
 
-Sitemap: https://k-power-tech-elon.vercel.app/
+Disallow: /api/
+
+Sitemap: https://www.k-power-tech.com/sitemap.xml

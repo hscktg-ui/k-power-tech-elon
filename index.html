@@ -8,8 +8,14 @@
       name="description"
       content="(주)광파워텍. 인버터·콘덴서·기동 리액터와 건식 변압기 설계·제작. 김포 메카존. 031-999-8301 · dk8805@naver.com"
     />
-    <meta name="keywords" content="광파워텍,변압기,리액터,인버터 리액터,건식 변압기,김포,메카존,K-POWER TECH" />
+    <meta name="keywords" content="광파워텍,변압기,리액터,인버터 리액터,건식 변압기,김포,메카존,K-POWER TECH,직렬리액터,기동리액터" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="googlebot" content="index,follow" />
+    <meta name="author" content="(주)광파워텍" />
+    <meta name="geo.region" content="KR-41" />
+    <meta name="geo.placename" content="김포시" />
     <link rel="canonical" href="https://www.k-power-tech.com/" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
     <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png" />
     <link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png" />
@@ -56,22 +62,71 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "(주)광파워텍",
-        "alternateName": "K-POWER TECH",
-        "url": "https://www.k-power-tech.com/",
-        "logo": "https://www.k-power-tech.com/images/logo-512.png",
-        "email": "dk8805@naver.com",
-        "telephone": "+82-31-999-8301",
-        "faxNumber": "+82-31-999-8302",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "양촌읍 황금로 117, 메카존 526호·528호",
-          "addressLocality": "김포시",
-          "addressRegion": "경기도",
-          "addressCountry": "KR"
-        },
-        "vatID": "224-87-02338"
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.k-power-tech.com/#organization",
+            "name": "(주)광파워텍",
+            "alternateName": ["K-POWER TECH", "광파워텍"],
+            "url": "https://www.k-power-tech.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.k-power-tech.com/images/logo-512.png"
+            },
+            "image": "https://www.k-power-tech.com/og.jpg",
+            "email": "dk8805@naver.com",
+            "telephone": "+82-31-999-8301",
+            "faxNumber": "+82-31-999-8302",
+            "taxID": "224-87-02338",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "양촌읍 황금로 117, 메카존 526호·528호",
+              "addressLocality": "김포시",
+              "addressRegion": "경기도",
+              "addressCountry": "KR"
+            },
+            "areaServed": "KR",
+            "sameAs": ["https://www.k-power-tech.com/"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.k-power-tech.com/#website",
+            "url": "https://www.k-power-tech.com/",
+            "name": "광파워텍 K-POWER TECH",
+            "description": "인버터·콘덴서·기동 리액터와 건식 변압기 설계·제작",
+            "publisher": { "@id": "https://www.k-power-tech.com/#organization" },
+            "inLanguage": "ko-KR"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://www.k-power-tech.com/#webpage",
+            "url": "https://www.k-power-tech.com/",
+            "name": "(주)광파워텍 | 변압기·리액터 전문 제조",
+            "isPartOf": { "@id": "https://www.k-power-tech.com/#website" },
+            "about": { "@id": "https://www.k-power-tech.com/#organization" },
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://www.k-power-tech.com/og.jpg"
+            },
+            "inLanguage": "ko-KR"
+          },
+          {
+            "@type": "LocalBusiness",
+            "@id": "https://www.k-power-tech.com/#localbusiness",
+            "name": "(주)광파워텍",
+            "image": "https://www.k-power-tech.com/og.jpg",
+            "url": "https://www.k-power-tech.com/",
+            "telephone": "+82-31-999-8301",
+            "email": "dk8805@naver.com",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "경기도 김포시 양촌읍 황금로 117, 메카존 526호·528호",
+              "addressLocality": "김포시",
+              "addressRegion": "경기도",
+              "addressCountry": "KR"
+            }
+          }
+        ]
       }
     </script>
   </head>
