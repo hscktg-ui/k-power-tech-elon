@@ -1,5 +1,6 @@
 (() => {
   const INQUIRY_EMAIL = "dk8805@naver.com";
+  const SUBMIT_URL = `https://formsubmit.co/ajax/${INQUIRY_EMAIL}`;
 
   const year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
@@ -38,36 +39,16 @@
   const toast = document.getElementById("form-toast");
   const submitBtn = document.getElementById("submit-btn");
 
-  const buildBody = (data) =>
-    [
-      "[광파워텍 기술·견적 문의]",
-      "",
-      `업체명: ${data.get("company") || ""}`,
-      `담당자: ${data.get("name") || ""}`,
-      `연락처: ${data.get("phone") || ""}`,
-      `회신메일: ${data.get("email") || ""}`,
-      `제품군: ${data.get("type") || ""}`,
-      `모델/용량: ${data.get("model") || ""}`,
-      `수량: ${data.get("qty") || ""}`,
-      "전압·상·납기·기타:",
-      `${data.get("message") || ""}`,
-      "",
-      `개인정보 동의: ${data.get("privacy") || ""}`,
-    ].join("\n");
-
-  const buildMailto = (data) => {
-    const subject = encodeURIComponent("[광파워텍] 기술·견적 문의");
-    const body = encodeURIComponent(buildBody(data));
-    return `mailto:${INQUIRY_EMAIL}?subject=${subject}&body=${body}`;
-  };
-
-  const showToast = (msg) => {
+  const showToast = (msg, tone = "ok") => {
     if (!toast) return;
     toast.hidden = false;
+    toast.dataset.tone = tone;
     toast.textContent = msg;
   };
 
-  // Direct to dk8805@naver.com via mail client — no FormSubmit activation page
+  const isActivationMessage = (text = "") =>
+    /activat|check your email|확인|활성화/i.test(String(text));
+
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!form.checkValidity()) {
@@ -76,34 +57,75 @@
     }
 
     const data = new FormData(form);
-    const mailto = buildMailto(data);
-    const plain = buildBody(data);
+    const payload = {
+      _subject: "[광파워텍] 기술·견적 문의",
+      _template: "table",
+      _captcha: "false",
+      _replyto: String(data.get("email") || ""),
+      company: String(data.get("company") || ""),
+      name: String(data.get("name") || ""),
+      phone: String(data.get("phone") || ""),
+      email: String(data.get("email") || ""),
+      type: String(data.get("type") || ""),
+      model: String(data.get("model") || ""),
+      qty: String(data.get("qty") || ""),
+      message: String(data.get("message") || ""),
+      privacy: String(data.get("privacy") || ""),
+      source: "k-power-tech-elon.vercel.app",
+    };
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = "메일 여는 중…";
+      submitBtn.textContent = "전송 중…";
     }
+    showToast("문의 전송 중입니다…", "pending");
 
     try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(plain);
+      const res = await fetch(SUBMIT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      let result = {};
+      try {
+        result = await res.json();
+      } catch (_) {
+        result = {};
       }
+
+      const msg = String(result.message || "");
+      const ok = String(result.success) === "true" || result.success === true;
+
+      if (ok) {
+        form.reset();
+        showToast(`문의가 ${INQUIRY_EMAIL} 으로 전송되었습니다. 확인 후 회신드리겠습니다.`, "ok");
+        return;
+      }
+
+      if (isActivationMessage(msg) || !res.ok) {
+        showToast(
+          `최초 1회 활성화가 필요합니다. ${INQUIRY_EMAIL} 메일함(스팸 포함)에서 FormSubmit 메일의 Activate Form을 누른 뒤, 다시 「문의 보내기」를 눌러 주세요. 활성화 후에는 메일 앱 없이 바로 전송됩니다.`,
+          "warn"
+        );
+        return;
+      }
+
+      showToast(msg || "전송에 실패했습니다. 잠시 후 다시 시도하거나 031-999-8301로 연락 주세요.", "warn");
     } catch (_) {
-      /* clipboard optional */
-    }
-
-    location.href = mailto;
-
-    showToast(
-      `메일 앱이 열리면 수신자(${INQUIRY_EMAIL})를 확인한 뒤 보내 주십시오. 문의 내용은 클립보드에도 복사되었습니다.`
-    );
-
-    setTimeout(() => {
+      showToast(
+        `네트워크 오류로 전송되지 않았습니다. ${INQUIRY_EMAIL} 으로 직접 메일을 보내시거나 031-999-8301로 연락 주세요.`,
+        "warn"
+      );
+    } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = "문의 보내기";
       }
-    }, 1500);
+    }
   });
 
   const bands = document.querySelectorAll(".band");

@@ -983,9 +983,24 @@ address a:hover {
 }
 
 .form__ok {
-  text-align: center;
-  color: var(--red);
-  font-weight: 700;
+  text-align: left;
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.form__ok[data-tone="ok"] {
+  color: #0b6b3a;
+}
+
+.form__ok[data-tone="warn"] {
+  color: #8a4b00;
+}
+
+.form__ok[data-tone="pending"] {
+  color: var(--muted);
+  font-weight: 500;
 }
 
 @media (min-width: 900px) {
