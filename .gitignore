@@ -1,0 +1,27 @@
+# Build / OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Python helpers (local extraction only)
+assets/extract*.py
+assets/make_*.py
+assets/logo_*.py
+assets/render_*.py
+assets/crop_*.py
+assets/__pycache__/
+
+# Large intermediate extracts (keep brochure PDF + web images)
+images/brochure/
+images/pages/
+images/p1-img-*.jpg
+assets/brochure-text.txt
+assets/extract.py
+assets/extract_images.py
+assets/extract_logo.py
+assets/render_pages.py
+assets/crop_products.py
+assets/make_logo.py
+assets/make_logo2.py
+assets/logo_circle.py
+assets/logo_raw.py
