@@ -43,11 +43,27 @@
     if (!toast) return;
     toast.hidden = false;
     toast.dataset.tone = tone;
-    toast.textContent = msg;
+    toast.innerHTML = msg;
   };
 
-  const isActivation = (text = "") =>
-    /activat|check your email|confirm your email|활성화/i.test(String(text));
+  const buildLines = (data) => [
+    "[광파워텍 기술·견적 문의]",
+    `업체명: ${data.get("company") || ""}`,
+    `담당자: ${data.get("name") || ""}`,
+    `연락처: ${data.get("phone") || ""}`,
+    `회신메일: ${data.get("email") || ""}`,
+    `제품군: ${data.get("type") || ""}`,
+    `모델/용량: ${data.get("model") || ""}`,
+    `수량: ${data.get("qty") || ""}`,
+    `내용: ${data.get("message") || ""}`,
+  ];
+
+  const openGmailCompose = (data) => {
+    const subject = encodeURIComponent("[광파워텍] 기술·견적 문의");
+    const body = encodeURIComponent(buildLines(data).join("\n"));
+    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(INQUIRY_EMAIL)}&su=${subject}&body=${body}`;
+    window.open(url, "_blank", "noopener");
+  };
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -89,7 +105,6 @@
         },
         body: JSON.stringify(payload),
       });
-
       const raw = await res.text();
       let result = {};
       try {
@@ -98,30 +113,36 @@
         result = { success: false, message: raw };
       }
 
-      const msg = String(result.message || raw || "");
+      const msg = String(result.message || "");
       const ok = String(result.success) === "true" || result.success === true;
 
       if (ok) {
         form.reset();
-        showToast(`문의가 ${INQUIRY_EMAIL} 으로 전송되었습니다. 확인 후 회신드리겠습니다.`, "ok");
+        showToast(`문의가 <strong>${INQUIRY_EMAIL}</strong> 으로 전송되었습니다.`, "ok");
         return;
       }
 
-      if (isActivation(msg) || /just a moment|cloudflare/i.test(msg)) {
+      // Activation wall: open Gmail compose as immediate send path
+      if (/activat|check your email/i.test(msg)) {
+        openGmailCompose(data);
         showToast(
-          `바로 전송을 위해 최초 1회 활성화가 필요합니다. ${INQUIRY_EMAIL} 메일함(스팸함 포함)에서 FormSubmit 메일의 「Activate Form」을 클릭한 다음, 이 화면에서 다시 「문의 보내기」를 눌러 주세요.`,
+          `서버 활성화 대기 중입니다. <strong>Gmail 작성창</strong>을 열어 두었습니다 — 보내기만 누르면 <strong>${INQUIRY_EMAIL}</strong>로 전달됩니다.<br/><br/>앞으로 바로 전송하려면 네이버(<strong>${INQUIRY_EMAIL}</strong>) 스팸함에서 FormSubmit 메일의 <strong>Activate Form</strong>을 한 번만 눌러 주세요.`,
           "warn"
         );
         return;
       }
 
+      openGmailCompose(data);
       showToast(
-        msg.slice(0, 180) ||
-          `전송에 실패했습니다. ${INQUIRY_EMAIL} 또는 031-999-8301로 연락 주세요.`,
+        `자동 전송에 실패해 Gmail 작성창으로 전환했습니다. 보내기를 눌러 <strong>${INQUIRY_EMAIL}</strong>로 전달해 주세요. 급하시면 <a href="tel:0319998301">031-999-8301</a>`,
         "warn"
       );
     } catch (_) {
-      showToast(`네트워크 오류입니다. ${INQUIRY_EMAIL} / 031-999-8301 로 연락 주세요.`, "warn");
+      openGmailCompose(data);
+      showToast(
+        `네트워크 오류로 Gmail 작성창을 열었습니다. 보내기를 눌러 주세요. · <a href="tel:0319998301">031-999-8301</a>`,
+        "warn"
+      );
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
