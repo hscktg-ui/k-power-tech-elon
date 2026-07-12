@@ -72,11 +72,18 @@ p {
 
 .block-head {
   margin-bottom: 2rem;
-  max-width: 28rem;
+  max-width: 36rem;
 }
 
 .block-head h2 {
   font-size: clamp(1.85rem, 4vw, 2.75rem);
+}
+
+.block-head__lead {
+  margin-top: 0.85rem;
+  color: var(--muted);
+  font-weight: 300;
+  font-size: 1rem;
 }
 
 .btn {
@@ -142,7 +149,7 @@ p {
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.7rem;
   color: #fff;
 }
 
@@ -155,9 +162,9 @@ p {
 .footer__brand img {
   width: 2.35rem;
   height: 2.35rem;
-  border-radius: 50%;
+  border-radius: 0;
   background: transparent;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .hero__brand img {
@@ -170,11 +177,33 @@ p {
   height: 2.25rem;
 }
 
+.brand__text {
+  display: grid;
+  line-height: 1.15;
+}
+
 .brand__name {
   font-family: var(--display);
   font-weight: 800;
   font-size: 1.05rem;
   letter-spacing: -0.02em;
+}
+
+.brand__sub {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  opacity: 0.72;
+}
+
+.btn--outline {
+  border-color: var(--navy);
+  color: var(--navy);
+  background: transparent;
+}
+
+.btn--outline:hover {
+  background: rgba(0, 32, 96, 0.06);
 }
 
 .menu-btn {
@@ -323,9 +352,9 @@ p {
 }
 
 .hero h1 {
-  font-size: clamp(2.4rem, 7.2vw, 4.6rem);
+  font-size: clamp(2.3rem, 6.5vw, 4.2rem);
   font-weight: 800;
-  max-width: 12ch;
+  max-width: 14ch;
 }
 
 .hero__lead {
@@ -343,34 +372,62 @@ p {
   margin-top: 1.85rem;
 }
 
-/* Position statement */
-.position {
+/* Company facts */
+.company {
+  padding: 4.5rem 0 4rem;
   background:
     linear-gradient(180deg, #fff, var(--bg)),
     radial-gradient(ellipse 80% 60% at 100% 0%, rgba(0, 32, 96, 0.06), transparent);
   border-bottom: 1px solid var(--line);
 }
 
-.position__inner {
-  padding: 2.5rem 0;
+.facts {
+  margin: 0;
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line);
 }
 
-.position p {
-  max-width: 48rem;
-  font-size: 1.08rem;
-  font-weight: 300;
+.facts > div {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.facts dt {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: var(--muted);
 }
 
-.position strong {
-  color: var(--ink);
-  font-weight: 600;
+.facts dd {
+  margin: 0;
+  font-weight: 500;
 }
 
-.position em {
-  font-style: normal;
-  color: var(--navy);
-  font-weight: 700;
+.facts a:hover {
+  color: var(--red);
+}
+
+.company__note {
+  margin-top: 1.5rem;
+  max-width: 46rem;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+@media (min-width: 800px) {
+  .facts {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .facts > div:nth-child(odd) {
+    padding-right: 1.5rem;
+  }
 }
 
 /* Products — image bands, not card chrome */
@@ -443,21 +500,12 @@ p {
   }
 }
 
-/* Proof gallery — photos only, no frames as cards */
-.proof {
+/* Catalog gallery */
+.catalog {
   padding: 4.5rem 0 5rem;
   background:
     radial-gradient(ellipse 70% 50% at 20% 0%, rgba(0, 32, 96, 0.08), transparent),
     linear-gradient(180deg, #f7f8fa, #eef1f5);
-  color: var(--ink);
-}
-
-.proof .eyebrow {
-  color: var(--red);
-}
-
-.proof .block-head h2 {
-  color: var(--ink);
 }
 
 .proof__grid {
@@ -482,6 +530,51 @@ p {
 @media (min-width: 800px) {
   .proof__grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Process */
+.process {
+  padding: 4.5rem 0;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.steps li {
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.steps strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
+}
+
+.steps p {
+  color: var(--muted);
+  font-weight: 300;
+}
+
+@media (min-width: 900px) {
+  .steps {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+  }
+
+  .steps li {
+    border-bottom: 0;
+    border-top: 2px solid var(--red);
+    padding-top: 1rem;
   }
 }
 
@@ -587,10 +680,23 @@ p {
   margin-bottom: 0.85rem;
 }
 
-.contact > .shell > div > p,
 .contact__layout > div > p {
   color: var(--muted);
   font-weight: 300;
+}
+
+.contact__layout > div > p strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.contact__needs {
+  margin: 1.25rem 0 0;
+  padding: 0 0 0 1.1rem;
+  color: var(--muted);
+  font-weight: 300;
+  display: grid;
+  gap: 0.35rem;
 }
 
 address {
@@ -611,6 +717,27 @@ address a:hover {
   padding: 1.35rem;
   background: var(--bg);
   border: 1px solid var(--line);
+}
+
+.form__honey {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+.form__hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 400;
+  text-align: center;
+}
+
+.form__hint a {
+  color: var(--navy);
+  font-weight: 600;
 }
 
 .form label {
@@ -688,6 +815,15 @@ address a:hover {
 .footer__brand span,
 .footer p {
   font-size: 0.88rem;
+}
+
+.footer__meta {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.footer__meta a:hover {
+  color: #fff;
 }
 
 .footer__copy {
