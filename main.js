@@ -1,6 +1,6 @@
 (() => {
   const INQUIRY_EMAIL = "dk8805@naver.com";
-  const SUBMIT_URL = `https://formsubmit.co/ajax/${INQUIRY_EMAIL}`;
+  const SUBMIT_URL = "/api/inquiry";
 
   const year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
@@ -106,9 +106,9 @@
         return;
       }
 
-      if (isActivationMessage(msg) || !res.ok) {
+      if (result.needsActivation || isActivationMessage(msg)) {
         showToast(
-          `최초 1회 활성화가 필요합니다. ${INQUIRY_EMAIL} 메일함(스팸 포함)에서 FormSubmit 메일의 Activate Form을 누른 뒤, 다시 「문의 보내기」를 눌러 주세요. 활성화 후에는 메일 앱 없이 바로 전송됩니다.`,
+          `최초 1회 활성화가 필요합니다. 지금 ${INQUIRY_EMAIL} 메일함(스팸 포함)을 열어 FormSubmit 메일의 「Activate Form」을 누른 뒤, 이 페이지에서 다시 「문의 보내기」를 눌러 주세요. 이후부터는 바로 전송됩니다.`,
           "warn"
         );
         return;
