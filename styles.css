@@ -367,14 +367,32 @@ p {
 }
 
 .hero h1 {
-  font-size: clamp(2.3rem, 6.5vw, 4.2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: clamp(2.1rem, 5.8vw, 3.85rem);
   font-weight: 800;
-  max-width: 14ch;
+  max-width: 16ch;
+  line-height: 1.12;
+}
+
+.hero__name {
+  display: block;
+  letter-spacing: -0.02em;
+}
+
+.hero__tag {
+  display: block;
+  font-size: 0.52em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 22ch;
 }
 
 .hero__lead {
   margin-top: 1.15rem;
-  max-width: 28rem;
+  max-width: 30rem;
   color: rgba(255, 255, 255, 0.86);
   font-weight: 300;
   font-size: 1.05rem;
@@ -1077,6 +1095,14 @@ address a:hover {
 
 .footer__meta a:hover {
   color: #fff;
+}
+
+.footer__seo {
+  margin-top: 0.45rem;
+  max-width: 28rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.45;
 }
 
 .footer__copy {

@@ -1,8 +1,20 @@
+# Naver Yeti
+User-agent: Yeti
+Allow: /
+Allow: /images/
+Allow: /k-power-tech-brochure.pdf
+Disallow: /api/
+
+# Google
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+
+# All crawlers
 User-agent: *
 Allow: /
 Allow: /images/
 Allow: /k-power-tech-brochure.pdf
-
 Disallow: /api/
 
 Sitemap: https://www.k-power-tech.com/sitemap.xml
