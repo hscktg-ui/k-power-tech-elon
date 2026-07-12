@@ -322,13 +322,6 @@ p {
   font-size: 0.95rem;
 }
 
-.hero__brand img {
-  width: 3.25rem;
-  height: 3.25rem;
-  border-radius: 50%;
-  background: #000;
-}
-
 .hero h1 {
   font-size: clamp(2.4rem, 7.2vw, 4.6rem);
   font-weight: 800;
@@ -684,13 +677,6 @@ address a:hover {
   display: flex;
   gap: 0.7rem;
   align-items: center;
-}
-
-.footer__brand img {
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  background: #000;
 }
 
 .footer__brand strong {
