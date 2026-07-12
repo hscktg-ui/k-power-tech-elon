@@ -43,7 +43,7 @@
   if (params.get("sent") === "1" || location.hash.includes("sent=1")) {
     if (toast) {
       toast.hidden = false;
-      toast.textContent = "접수가 전송되었습니다. dk8805@naver.com 에서 확인합니다.";
+      toast.textContent = "문의가 접수되었습니다. 확인 후 회신드리겠습니다.";
     }
   }
 
@@ -90,7 +90,7 @@
     location.href = buildMailto();
     if (toast) {
       toast.hidden = false;
-      toast.textContent = "메일 앱이 열리면 수신자를 dk8805@naver.com 으로 확인해 보내 주십시오.";
+      toast.textContent = "메일 앱에서 수신 주소(dk8805@naver.com)를 확인한 뒤 보내 주십시오.";
     }
   });
 
