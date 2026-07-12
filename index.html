@@ -429,19 +429,7 @@
               <a href="mailto:dk8805@naver.com">dk8805@naver.com</a>
             </address>
           </div>
-          <form
-            class="form"
-            id="inquiry-form"
-            action="https://formsubmit.co/dk8805@naver.com"
-            method="POST"
-          >
-            <input type="hidden" name="_subject" value="[광파워텍] 기술·견적 문의" />
-            <input type="hidden" name="_template" value="table" />
-            <input type="hidden" name="_captcha" value="false" />
-            <input type="hidden" name="_next" value="https://k-power-tech-elon.vercel.app/#contact?sent=1" />
-            <input type="hidden" name="_replyto" id="replyto-field" value="" />
-            <input type="text" name="_honey" class="form__honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
-
+          <form class="form" id="inquiry-form" novalidate>
             <div class="form__row">
               <label>업체명<input name="company" required autocomplete="organization" /></label>
               <label>담당자<input name="name" autocomplete="name" /></label>
@@ -480,9 +468,11 @@
               >
             </label>
             <button class="btn btn--primary btn--block" type="submit" id="submit-btn">문의 보내기</button>
-            <button class="btn btn--outline btn--block" type="button" id="mailto-btn">이메일로 보내기</button>
-            <p class="form__hint">수신: <a href="mailto:dk8805@naver.com">dk8805@naver.com</a></p>
-            <p class="form__ok" id="form-toast" hidden>문의가 접수되었습니다. 확인 후 회신드리겠습니다.</p>
+            <p class="form__hint">
+              보내기 시 메일 앱이 열리며, 수신 주소는
+              <a href="mailto:dk8805@naver.com">dk8805@naver.com</a> 입니다.
+            </p>
+            <p class="form__ok" id="form-toast" hidden></p>
           </form>
         </div>
       </section>

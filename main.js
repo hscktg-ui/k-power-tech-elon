@@ -37,21 +37,10 @@
   const form = document.getElementById("inquiry-form");
   const toast = document.getElementById("form-toast");
   const submitBtn = document.getElementById("submit-btn");
-  const mailtoBtn = document.getElementById("mailto-btn");
 
-  const params = new URLSearchParams(location.search);
-  if (params.get("sent") === "1" || location.hash.includes("sent=1")) {
-    if (toast) {
-      toast.hidden = false;
-      toast.textContent = "문의가 접수되었습니다. 확인 후 회신드리겠습니다.";
-    }
-  }
-
-  const buildMailto = () => {
-    if (!form) return `mailto:${INQUIRY_EMAIL}`;
-    const data = new FormData(form);
-    const lines = [
-      "[광파워텍 견적 문의]",
+  const buildBody = (data) =>
+    [
+      "[광파워텍 기술·견적 문의]",
       "",
       `업체명: ${data.get("company") || ""}`,
       `담당자: ${data.get("name") || ""}`,
@@ -59,39 +48,62 @@
       `회신메일: ${data.get("email") || ""}`,
       `제품군: ${data.get("type") || ""}`,
       `모델/용량: ${data.get("model") || ""}`,
-      "전압·상·수량·납기:",
+      `수량: ${data.get("qty") || ""}`,
+      "전압·상·납기·기타:",
       `${data.get("message") || ""}`,
-    ];
-    return `mailto:${INQUIRY_EMAIL}?subject=${encodeURIComponent("[광파워텍] 견적 문의")}&body=${encodeURIComponent(lines.join("\n"))}`;
+      "",
+      `개인정보 동의: ${data.get("privacy") || ""}`,
+    ].join("\n");
+
+  const buildMailto = (data) => {
+    const subject = encodeURIComponent("[광파워텍] 기술·견적 문의");
+    const body = encodeURIComponent(buildBody(data));
+    return `mailto:${INQUIRY_EMAIL}?subject=${subject}&body=${body}`;
   };
 
-  // Primary path: native POST → FormSubmit → dk8805@naver.com
-  form?.addEventListener("submit", (e) => {
+  const showToast = (msg) => {
+    if (!toast) return;
+    toast.hidden = false;
+    toast.textContent = msg;
+  };
+
+  // Direct to dk8805@naver.com via mail client — no FormSubmit activation page
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
     if (!form.checkValidity()) {
-      e.preventDefault();
       form.reportValidity();
       return;
     }
-    const reply = form.querySelector("#replyto-field");
-    const email = form.querySelector('input[name="email"]');
-    if (reply && email) reply.value = email.value;
+
+    const data = new FormData(form);
+    const mailto = buildMailto(data);
+    const plain = buildBody(data);
+
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = "전송 중…";
+      submitBtn.textContent = "메일 여는 중…";
     }
-  });
 
-  mailtoBtn?.addEventListener("click", (e) => {
-    e.preventDefault();
-    if (!form?.checkValidity()) {
-      form.reportValidity();
-      return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(plain);
+      }
+    } catch (_) {
+      /* clipboard optional */
     }
-    location.href = buildMailto();
-    if (toast) {
-      toast.hidden = false;
-      toast.textContent = "메일 앱에서 수신 주소(dk8805@naver.com)를 확인한 뒤 보내 주십시오.";
-    }
+
+    location.href = mailto;
+
+    showToast(
+      `메일 앱이 열리면 수신자(${INQUIRY_EMAIL})를 확인한 뒤 보내 주십시오. 문의 내용은 클립보드에도 복사되었습니다.`
+    );
+
+    setTimeout(() => {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "문의 보내기";
+      }
+    }, 1500);
   });
 
   const bands = document.querySelectorAll(".band");
