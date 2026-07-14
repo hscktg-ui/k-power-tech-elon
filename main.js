@@ -1,6 +1,6 @@
 (() => {
   const INQUIRY_EMAIL = "dk8805@naver.com";
-  const API_URL = "/api/inquiry";
+  const SUBJECT = "[광파워텍] 기술·견적 문의";
 
   const year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
@@ -37,7 +37,6 @@
 
   const form = document.getElementById("inquiry-form");
   const toast = document.getElementById("form-toast");
-  const submitBtn = document.getElementById("submit-btn");
 
   const showToast = (msg, tone = "ok") => {
     if (!toast) return;
@@ -47,31 +46,41 @@
     toast.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
-  const buildLines = (data) => [
-    "[광파워텍 기술·견적 문의]",
-    `업체명: ${data.get("company") || ""}`,
-    `담당자: ${data.get("name") || ""}`,
-    `연락처: ${data.get("phone") || ""}`,
-    `회신메일: ${data.get("email") || ""}`,
-    `제품군: ${data.get("type") || ""}`,
-    `모델/용량: ${data.get("model") || ""}`,
-    `수량: ${data.get("qty") || ""}`,
-    `내용: ${data.get("message") || ""}`,
-  ];
+  const buildBody = (data) =>
+    [
+      "[광파워텍 기술·견적 문의]",
+      `업체명: ${data.get("company") || ""}`,
+      `담당자: ${data.get("name") || ""}`,
+      `연락처: ${data.get("phone") || ""}`,
+      `회신메일: ${data.get("email") || ""}`,
+      `제품군: ${data.get("type") || ""}`,
+      `모델/용량: ${data.get("model") || ""}`,
+      `수량: ${data.get("qty") || ""}`,
+      `내용: ${data.get("message") || ""}`,
+    ].join("\n");
 
-  const openMailClient = (data) => {
-    const subject = encodeURIComponent("[광파워텍] 기술·견적 문의");
-    const body = encodeURIComponent(buildLines(data).join("\n"));
-    const a = document.createElement("a");
-    a.href = `mailto:${INQUIRY_EMAIL}?subject=${subject}&body=${body}`;
-    a.rel = "noopener";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  const openGmail = (body) => {
+    const url =
+      "https://mail.google.com/mail/?view=cm&fs=1&tf=1" +
+      `&to=${encodeURIComponent(INQUIRY_EMAIL)}` +
+      `&su=${encodeURIComponent(SUBJECT)}` +
+      `&body=${encodeURIComponent(body)}`;
+    window.open(url, "_blank", "noopener");
   };
 
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  const openNaver = async (body) => {
+    try {
+      await navigator.clipboard.writeText(`${SUBJECT}\n\n${body}`);
+    } catch (_) {
+      /* clipboard may be denied */
+    }
+    // Naver write URL reliably accepts recipient; body is pasted by user if needed
+    const url = `https://mail.naver.com/write?to=${encodeURIComponent(INQUIRY_EMAIL)}`;
+    window.open(url, "_blank", "noopener");
+  };
+
+  const sendVia = async (provider) => {
+    if (!form) return;
     if (!form.checkValidity()) {
       form.reportValidity();
       showToast("필수 항목(업체명·연락처·회신 메일·제품군·개인정보 동의)을 확인해 주세요.", "warn");
@@ -79,64 +88,30 @@
     }
 
     const data = new FormData(form);
-    const payload = {
-      _subject: "[광파워텍] 기술·견적 문의",
-      company: String(data.get("company") || ""),
-      name: String(data.get("name") || ""),
-      phone: String(data.get("phone") || ""),
-      email: String(data.get("email") || ""),
-      type: String(data.get("type") || ""),
-      model: String(data.get("model") || ""),
-      qty: String(data.get("qty") || ""),
-      message: String(data.get("message") || ""),
-      privacy: String(data.get("privacy") || ""),
-      source: location.origin,
-    };
+    const body = buildBody(data);
 
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = "전송 중…";
-    }
-    showToast("문의 자동 전송 중입니다…", "pending");
-
-    let delivered = false;
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 12000);
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      });
-      clearTimeout(timer);
-      const result = await res.json().catch(() => ({}));
-      delivered = res.ok && (result.success === true || String(result.success) === "true");
-    } catch (_) {
-      delivered = false;
-    }
-
-    if (delivered) {
-      form.reset();
+    if (provider === "gmail") {
+      openGmail(body);
       showToast(
-        `문의가 <strong>${INQUIRY_EMAIL}</strong> 으로 자동 전송되었습니다. 영업일 기준 회신드립니다.`,
+        `Gmail 작성창을 열었습니다. <strong>보내기</strong>만 누르면 <strong>${INQUIRY_EMAIL}</strong>로 전달됩니다.`,
         "ok"
       );
-    } else {
-      openMailClient(data);
-      showToast(
-        `자동 전송 설정 전이거나 일시 오류입니다. 메일 작성창을 열었으니 <strong>보내기</strong>를 눌러 주세요.<br/><a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> · <a href="tel:0319998301">031-999-8301</a>`,
-        "warn"
-      );
+      return;
     }
 
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "문의 보내기";
-    }
+    await openNaver(body);
+    showToast(
+      `네이버 메일 작성창을 열었습니다. 받는사람이 비어 있으면 <strong>${INQUIRY_EMAIL}</strong>을 입력하고, 본문은 <strong>Ctrl+V</strong>로 붙여넣은 뒤 보내기를 눌러 주세요.`,
+      "ok"
+    );
+  };
+
+  document.getElementById("send-naver")?.addEventListener("click", () => sendVia("naver"));
+  document.getElementById("send-gmail")?.addEventListener("click", () => sendVia("gmail"));
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    sendVia("naver");
   });
 
   const bands = document.querySelectorAll(".band");

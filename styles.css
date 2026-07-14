@@ -963,6 +963,24 @@ address a:hover {
   font-weight: 600;
 }
 
+.form__mail-actions {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.15rem;
+}
+
+@media (min-width: 520px) {
+  .form__mail-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form__mail-actions .btn {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
 .form label {
   display: grid;
   gap: 0.35rem;
