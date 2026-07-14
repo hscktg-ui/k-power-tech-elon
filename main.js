@@ -73,22 +73,24 @@
     }
 
     const data = new FormData(form);
-    const payload = {
-      access_key: WEB3FORMS_KEY,
-      subject: `[광파워텍] 견적 문의 — ${data.get("company") || ""} / ${data.get("type") || ""}`,
-      from_name: String(data.get("company") || "광파워텍 홈페이지"),
-      email: String(data.get("email") || ""),
-      replyto: String(data.get("email") || ""),
-      message: buildMessage(data),
-      company: String(data.get("company") || ""),
-      name: String(data.get("name") || ""),
-      phone: String(data.get("phone") || ""),
-      type: String(data.get("type") || ""),
-      model: String(data.get("model") || ""),
-      qty: String(data.get("qty") || ""),
-      privacy: String(data.get("privacy") || ""),
-      botcheck: "",
-    };
+    // FormData POST avoids CORS preflight (JSON Content-Type is blocked by Web3Forms free plan).
+    const payload = new FormData();
+    payload.append("access_key", WEB3FORMS_KEY);
+    payload.append(
+      "subject",
+      `[광파워텍] 견적 문의 - ${data.get("company") || ""} / ${data.get("type") || ""}`
+    );
+    payload.append("from_name", String(data.get("company") || "광파워텍 홈페이지"));
+    payload.append("email", String(data.get("email") || ""));
+    payload.append("replyto", String(data.get("email") || ""));
+    payload.append("message", buildMessage(data));
+    payload.append("company", String(data.get("company") || ""));
+    payload.append("name", String(data.get("name") || ""));
+    payload.append("phone", String(data.get("phone") || ""));
+    payload.append("type", String(data.get("type") || ""));
+    payload.append("model", String(data.get("model") || ""));
+    payload.append("qty", String(data.get("qty") || ""));
+    payload.append("privacy", String(data.get("privacy") || ""));
 
     if (submitBtn) {
       submitBtn.disabled = true;
@@ -103,16 +105,16 @@
       const timer = setTimeout(() => controller.abort(), 15000);
       const res = await fetch(WEB3FORMS_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(payload),
+        body: payload,
         signal: controller.signal,
       });
       clearTimeout(timer);
       const result = await res.json().catch(() => ({}));
       delivered = result.success === true || String(result.success) === "true";
       errMsg = String(result.message || "");
-    } catch (_) {
+    } catch (err) {
       delivered = false;
+      errMsg = err && err.name === "AbortError" ? "시간 초과" : "네트워크 오류";
     }
 
     if (delivered) {
