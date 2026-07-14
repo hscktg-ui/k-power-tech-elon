@@ -1,6 +1,8 @@
 (() => {
   const INQUIRY_EMAIL = "dk8805@naver.com";
-  const API_URL = "/api/inquiry";
+  // Web3Forms access key is designed to be used client-side (public).
+  const WEB3FORMS_KEY = "026993fe-8503-4a2c-b4e0-530ef47a8bed";
+  const WEB3FORMS_URL = "https://api.web3forms.com/submit";
 
   const year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
@@ -47,6 +49,21 @@
     toast.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
+  const buildMessage = (data) =>
+    [
+      "[광파워텍 홈페이지 기술·견적 문의]",
+      `업체명: ${data.get("company") || ""}`,
+      `담당자: ${data.get("name") || ""}`,
+      `연락처: ${data.get("phone") || ""}`,
+      `회신메일: ${data.get("email") || ""}`,
+      `제품군: ${data.get("type") || ""}`,
+      `모델/용량: ${data.get("model") || ""}`,
+      `수량: ${data.get("qty") || ""}`,
+      `내용: ${data.get("message") || ""}`,
+      `개인정보동의: ${data.get("privacy") || ""}`,
+      `유입경로: ${location.href}`,
+    ].join("\n");
+
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!form.checkValidity()) {
@@ -57,17 +74,20 @@
 
     const data = new FormData(form);
     const payload = {
-      _subject: `[광파워텍] 견적 문의 — ${data.get("company") || ""} / ${data.get("type") || ""}`,
+      access_key: WEB3FORMS_KEY,
+      subject: `[광파워텍] 견적 문의 — ${data.get("company") || ""} / ${data.get("type") || ""}`,
+      from_name: String(data.get("company") || "광파워텍 홈페이지"),
+      email: String(data.get("email") || ""),
+      replyto: String(data.get("email") || ""),
+      message: buildMessage(data),
       company: String(data.get("company") || ""),
       name: String(data.get("name") || ""),
       phone: String(data.get("phone") || ""),
-      email: String(data.get("email") || ""),
       type: String(data.get("type") || ""),
       model: String(data.get("model") || ""),
       qty: String(data.get("qty") || ""),
-      message: String(data.get("message") || ""),
       privacy: String(data.get("privacy") || ""),
-      source: location.href,
+      botcheck: "",
     };
 
     if (submitBtn) {
@@ -77,11 +97,11 @@
     showToast("문의 내용을 전송하고 있습니다…", "pending");
 
     let delivered = false;
-    let code = "";
+    let errMsg = "";
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 15000);
-      const res = await fetch(API_URL, {
+      const res = await fetch(WEB3FORMS_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
@@ -89,8 +109,8 @@
       });
       clearTimeout(timer);
       const result = await res.json().catch(() => ({}));
-      code = String(result.code || "");
-      delivered = res.ok && (result.success === true || String(result.success) === "true");
+      delivered = result.success === true || String(result.success) === "true";
+      errMsg = String(result.message || "");
     } catch (_) {
       delivered = false;
     }
@@ -101,14 +121,9 @@
         `문의가 접수되었습니다. <strong>${INQUIRY_EMAIL}</strong>으로 전달되며, 영업일 기준 회신드립니다.`,
         "ok"
       );
-    } else if (code === "NOT_CONFIGURED") {
-      showToast(
-        `자동 메일 설정이 아직 완료되지 않았습니다. 급한 문의는 <a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> 또는 <a href="tel:0319998301">031-999-8301</a>로 연락해 주세요.`,
-        "warn"
-      );
     } else {
       showToast(
-        `전송에 실패했습니다. <a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> 또는 <a href="tel:0319998301">031-999-8301</a>로 연락 부탁드립니다.`,
+        `전송에 실패했습니다${errMsg ? ` (${errMsg})` : ""}. <a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> 또는 <a href="tel:0319998301">031-999-8301</a>로 연락 부탁드립니다.`,
         "warn"
       );
     }
