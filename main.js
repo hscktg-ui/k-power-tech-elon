@@ -1,6 +1,6 @@
 (() => {
   const INQUIRY_EMAIL = "dk8805@naver.com";
-  const SUBJECT = "[광파워텍] 기술·견적 문의";
+  const API_URL = "/api/inquiry";
 
   const year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
@@ -37,6 +37,7 @@
 
   const form = document.getElementById("inquiry-form");
   const toast = document.getElementById("form-toast");
+  const submitBtn = document.getElementById("submit-btn");
 
   const showToast = (msg, tone = "ok") => {
     if (!toast) return;
@@ -46,41 +47,8 @@
     toast.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
-  const buildBody = (data) =>
-    [
-      "[광파워텍 기술·견적 문의]",
-      `업체명: ${data.get("company") || ""}`,
-      `담당자: ${data.get("name") || ""}`,
-      `연락처: ${data.get("phone") || ""}`,
-      `회신메일: ${data.get("email") || ""}`,
-      `제품군: ${data.get("type") || ""}`,
-      `모델/용량: ${data.get("model") || ""}`,
-      `수량: ${data.get("qty") || ""}`,
-      `내용: ${data.get("message") || ""}`,
-    ].join("\n");
-
-  const openGmail = (body) => {
-    const url =
-      "https://mail.google.com/mail/?view=cm&fs=1&tf=1" +
-      `&to=${encodeURIComponent(INQUIRY_EMAIL)}` +
-      `&su=${encodeURIComponent(SUBJECT)}` +
-      `&body=${encodeURIComponent(body)}`;
-    window.open(url, "_blank", "noopener");
-  };
-
-  const openNaver = async (body) => {
-    try {
-      await navigator.clipboard.writeText(`${SUBJECT}\n\n${body}`);
-    } catch (_) {
-      /* clipboard may be denied */
-    }
-    // Naver write URL reliably accepts recipient; body is pasted by user if needed
-    const url = `https://mail.naver.com/write?to=${encodeURIComponent(INQUIRY_EMAIL)}`;
-    window.open(url, "_blank", "noopener");
-  };
-
-  const sendVia = async (provider) => {
-    if (!form) return;
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
     if (!form.checkValidity()) {
       form.reportValidity();
       showToast("필수 항목(업체명·연락처·회신 메일·제품군·개인정보 동의)을 확인해 주세요.", "warn");
@@ -88,30 +56,67 @@
     }
 
     const data = new FormData(form);
-    const body = buildBody(data);
+    const payload = {
+      _subject: `[광파워텍] 견적 문의 — ${data.get("company") || ""} / ${data.get("type") || ""}`,
+      company: String(data.get("company") || ""),
+      name: String(data.get("name") || ""),
+      phone: String(data.get("phone") || ""),
+      email: String(data.get("email") || ""),
+      type: String(data.get("type") || ""),
+      model: String(data.get("model") || ""),
+      qty: String(data.get("qty") || ""),
+      message: String(data.get("message") || ""),
+      privacy: String(data.get("privacy") || ""),
+      source: location.href,
+    };
 
-    if (provider === "gmail") {
-      openGmail(body);
-      showToast(
-        `Gmail 작성창을 열었습니다. <strong>보내기</strong>만 누르면 <strong>${INQUIRY_EMAIL}</strong>로 전달됩니다.`,
-        "ok"
-      );
-      return;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "전송 중…";
+    }
+    showToast("문의 내용을 전송하고 있습니다…", "pending");
+
+    let delivered = false;
+    let code = "";
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 15000);
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      const result = await res.json().catch(() => ({}));
+      code = String(result.code || "");
+      delivered = res.ok && (result.success === true || String(result.success) === "true");
+    } catch (_) {
+      delivered = false;
     }
 
-    await openNaver(body);
-    showToast(
-      `네이버 메일 작성창을 열었습니다. 받는사람이 비어 있으면 <strong>${INQUIRY_EMAIL}</strong>을 입력하고, 본문은 <strong>Ctrl+V</strong>로 붙여넣은 뒤 보내기를 눌러 주세요.`,
-      "ok"
-    );
-  };
+    if (delivered) {
+      form.reset();
+      showToast(
+        `문의가 접수되었습니다. <strong>${INQUIRY_EMAIL}</strong>으로 전달되며, 영업일 기준 회신드립니다.`,
+        "ok"
+      );
+    } else if (code === "NOT_CONFIGURED") {
+      showToast(
+        `자동 메일 설정이 아직 완료되지 않았습니다. 급한 문의는 <a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> 또는 <a href="tel:0319998301">031-999-8301</a>로 연락해 주세요.`,
+        "warn"
+      );
+    } else {
+      showToast(
+        `전송에 실패했습니다. <a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> 또는 <a href="tel:0319998301">031-999-8301</a>로 연락 부탁드립니다.`,
+        "warn"
+      );
+    }
 
-  document.getElementById("send-naver")?.addEventListener("click", () => sendVia("naver"));
-  document.getElementById("send-gmail")?.addEventListener("click", () => sendVia("gmail"));
-
-  form?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    sendVia("naver");
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "문의 보내기";
+    }
   });
 
   const bands = document.querySelectorAll(".band");
