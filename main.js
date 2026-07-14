@@ -1,6 +1,5 @@
 (() => {
   const INQUIRY_EMAIL = "dk8805@naver.com";
-  const SUBMIT_URL = `https://formsubmit.co/ajax/${INQUIRY_EMAIL}`;
 
   const year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
@@ -59,7 +58,6 @@
     `내용: ${data.get("message") || ""}`,
   ];
 
-  /** Opens the user's mail app. Must run in the click handler (before long awaits). */
   const openMailClient = (data) => {
     const subject = encodeURIComponent("[광파워텍] 기술·견적 문의");
     const body = encodeURIComponent(buildLines(data).join("\n"));
@@ -80,75 +78,21 @@
     }
 
     const data = new FormData(form);
-    const payload = {
-      _subject: "[광파워텍] 기술·견적 문의",
-      _template: "table",
-      _captcha: "false",
-      _replyto: String(data.get("email") || ""),
-      company: String(data.get("company") || ""),
-      name: String(data.get("name") || ""),
-      phone: String(data.get("phone") || ""),
-      email: String(data.get("email") || ""),
-      type: String(data.get("type") || ""),
-      model: String(data.get("model") || ""),
-      qty: String(data.get("qty") || ""),
-      message: String(data.get("message") || ""),
-      privacy: String(data.get("privacy") || ""),
-      source: location.origin,
-    };
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "메일 앱 여는 중…";
+    }
 
-    // Immediate path — works even when FormSubmit is not activated
     openMailClient(data);
     showToast(
-      `메일 앱 작성창을 열었습니다. <strong>보내기</strong>를 누르면 <strong>${INQUIRY_EMAIL}</strong>로 전달됩니다.<br/>앱이 안 열리면 <a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> · <a href="tel:0319998301">031-999-8301</a>`,
+      `메일 작성창을 열었습니다. <strong>보내기</strong>를 누르면 <strong>${INQUIRY_EMAIL}</strong>로 전달됩니다.<br/>앱이 안 열리면 <a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> · <a href="tel:0319998301">031-999-8301</a>`,
       "ok"
     );
 
-    // Best-effort server relay (does not block UI)
     if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = "처리 중…";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "문의 보내기";
     }
-
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 6000);
-
-    fetch(SUBMIT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    })
-      .then((res) => res.text())
-      .then((raw) => {
-        let result = {};
-        try {
-          result = JSON.parse(raw);
-        } catch (_) {
-          result = {};
-        }
-        const ok = String(result.success) === "true" || result.success === true;
-        if (ok) {
-          form.reset();
-          showToast(
-            `문의가 <strong>${INQUIRY_EMAIL}</strong> 으로도 자동 전송되었습니다.`,
-            "ok"
-          );
-        }
-      })
-      .catch(() => {
-        /* mailto already opened — ignore relay errors */
-      })
-      .finally(() => {
-        clearTimeout(timer);
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "문의 보내기";
-        }
-      });
   });
 
   const bands = document.querySelectorAll(".band");
