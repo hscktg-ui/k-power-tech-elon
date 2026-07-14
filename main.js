@@ -1,5 +1,6 @@
 (() => {
   const INQUIRY_EMAIL = "dk8805@naver.com";
+  const API_URL = "/api/inquiry";
 
   const year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
@@ -69,7 +70,7 @@
     a.remove();
   };
 
-  form?.addEventListener("submit", (e) => {
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!form.checkValidity()) {
       form.reportValidity();
@@ -78,16 +79,59 @@
     }
 
     const data = new FormData(form);
+    const payload = {
+      _subject: "[광파워텍] 기술·견적 문의",
+      company: String(data.get("company") || ""),
+      name: String(data.get("name") || ""),
+      phone: String(data.get("phone") || ""),
+      email: String(data.get("email") || ""),
+      type: String(data.get("type") || ""),
+      model: String(data.get("model") || ""),
+      qty: String(data.get("qty") || ""),
+      message: String(data.get("message") || ""),
+      privacy: String(data.get("privacy") || ""),
+      source: location.origin,
+    };
+
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = "메일 앱 여는 중…";
+      submitBtn.textContent = "전송 중…";
+    }
+    showToast("문의 자동 전송 중입니다…", "pending");
+
+    let delivered = false;
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 12000);
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      const result = await res.json().catch(() => ({}));
+      delivered = res.ok && (result.success === true || String(result.success) === "true");
+    } catch (_) {
+      delivered = false;
     }
 
-    openMailClient(data);
-    showToast(
-      `메일 작성창을 열었습니다. <strong>보내기</strong>를 누르면 <strong>${INQUIRY_EMAIL}</strong>로 전달됩니다.<br/>앱이 안 열리면 <a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> · <a href="tel:0319998301">031-999-8301</a>`,
-      "ok"
-    );
+    if (delivered) {
+      form.reset();
+      showToast(
+        `문의가 <strong>${INQUIRY_EMAIL}</strong> 으로 자동 전송되었습니다. 영업일 기준 회신드립니다.`,
+        "ok"
+      );
+    } else {
+      openMailClient(data);
+      showToast(
+        `자동 전송 설정 전이거나 일시 오류입니다. 메일 작성창을 열었으니 <strong>보내기</strong>를 눌러 주세요.<br/><a href="mailto:${INQUIRY_EMAIL}">${INQUIRY_EMAIL}</a> · <a href="tel:0319998301">031-999-8301</a>`,
+        "warn"
+      );
+    }
 
     if (submitBtn) {
       submitBtn.disabled = false;
